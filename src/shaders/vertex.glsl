@@ -23,8 +23,9 @@ void main()
     vec4 modelPosition = modelMatrix*instanceMatrix * vec4(scaledPosition, 1.0);
 
     //cube elevation
-    float elevation =0.;        
-    modelPosition.y+=step(0.,position.y)*elevation;
+    float elevation =texel.g*uAmplitude;        
+    //modelPosition.y+=step(0.,position.y)*elevation;
+    modelPosition.y+=elevation;
     
     
     

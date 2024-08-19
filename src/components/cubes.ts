@@ -21,16 +21,18 @@ export default class Cubes {
   debug: GUI
   blockSize: number
 
-  constructor({ scene, sizes }: Props) {
+  constructor({ scene, sizes, debug }: Props) {
     this.scene = scene
     this.sizes = sizes
-    this.size = 150
+    this.size = 128
     this.blockSize = 0.25
+    this.debug = debug
 
     this.createGeometry()
     this.createMaterial()
     this.createInstancedMesh()
     this.positionMeshes()
+    this.setupDebug()
   }
 
   createMaterial() {
@@ -40,7 +42,7 @@ export default class Cubes {
       uniforms: {
         uTime: new THREE.Uniform(0),
         uBlockSize: new THREE.Uniform(this.blockSize),
-        uAmplitude: new THREE.Uniform(1),
+        uAmplitude: new THREE.Uniform(2),
         uTexture: new THREE.Uniform(new THREE.Vector4()),
       },
     })

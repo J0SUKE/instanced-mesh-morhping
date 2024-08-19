@@ -1,11 +1,14 @@
 import './style.css'
 import Canvas from './components/canvas'
+import Scroll from './components/scroll'
 
 class App {
   canvas: Canvas
+  scroll: Scroll
 
   constructor() {
     this.canvas = new Canvas()
+    this.scroll = new Scroll()
 
     this.render()
   }

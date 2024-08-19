@@ -2,17 +2,23 @@ import * as THREE from 'three'
 import vertexShader from '../shaders/geometry/vertex.glsl'
 import fragmentShader from '../shaders/geometry/fragment.glsl'
 import GUI from 'lil-gui'
+import gsap from 'gsap'
+import ScrollTrigger from 'gsap/dist/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
 
 interface Props {
   size: number
   renderer: THREE.WebGLRenderer
   scene: THREE.Scene
   debug: GUI
+  camera: THREE.PerspectiveCamera
 }
 
 export default class GeometryRenderer {
   renderTarget: THREE.WebGLRenderTarget
   camera: THREE.OrthographicCamera
+  perspcamera: THREE.PerspectiveCamera
   size: number
   material: THREE.ShaderMaterial
   plane: THREE.Mesh
@@ -21,18 +27,20 @@ export default class GeometryRenderer {
   scene: THREE.Scene
   debug: GUI
 
-  constructor({ size, scene, renderer, debug }: Props) {
+  constructor({ size, scene, renderer, debug, camera }: Props) {
     this.size = size
     this.renderer = renderer
     this.scene = scene
     this.debug = debug
+    this.perspcamera = camera
 
     this.createRenderTarget()
     this.createMaterial()
     this.createOrthographicCamera()
     this.createPlane()
-    this.createDebugPlane()
+    //this.createDebugPlane()
     this.setupDebug()
+    this.scrollProgress()
   }
 
   createRenderTarget() {
@@ -48,9 +56,10 @@ export default class GeometryRenderer {
       fragmentShader,
       uniforms: {
         uTime: new THREE.Uniform(0),
-        uWorldTexture: new THREE.Uniform(
+        uMapTexture: new THREE.Uniform(
           new THREE.TextureLoader().load('./usa.png', (texture) => {
             const { naturalWidth, naturalHeight } = texture.image
+            texture.magFilter = THREE.NearestFilter
             this.material.uniforms.uTextureRes.value = new THREE.Vector2(naturalWidth, naturalHeight)
           })
         ),
@@ -61,6 +70,7 @@ export default class GeometryRenderer {
         ),
         uTextureRes: new THREE.Uniform(new THREE.Vector2(1)),
         uMaskToMapProgress: new THREE.Uniform(0),
+        uTexture: new THREE.Uniform(new THREE.Vector4()),
       },
     })
   }
@@ -122,8 +132,52 @@ export default class GeometryRenderer {
     this.scene.add(this.debugPlane)
   }
 
+  scrollProgress() {
+    const container = document.getElementById('app')
+    if (!container) return
+
+    container.style.zIndex = '10'
+
+    const obj = { progress: 0 }
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: container,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        onUpdate: () => {
+          this.material.uniforms.uMaskToMapProgress.value = Math.pow(obj.progress, 3)
+        },
+      },
+    })
+
+    tl.fromTo(
+      this.perspcamera.position,
+      {
+        x: -4.6,
+        y: 6.2,
+        z: 5.1,
+      },
+      {
+        x: -2,
+        y: 11,
+        z: 8,
+      },
+      '<='
+    )
+
+    tl.to(
+      obj,
+      {
+        progress: 1,
+      },
+      '<='
+    )
+  }
+
   setupDebug() {
-    this.debug.add(this.material.uniforms.uMaskToMapProgress, 'value').min(0).max(1).step(0.001)
+    this.debug.add(this.material.uniforms.uMaskToMapProgress, 'value').min(0).max(1).step(0.001).listen()
   }
 
   updateDebugPlaneTexture() {
@@ -148,7 +202,7 @@ export default class GeometryRenderer {
     this.renderer.render(this.plane, this.camera)
 
     //const pixelData = this.readRenderTargetPixels()
-    this.updateDebugPlaneTexture()
+    //this.updateDebugPlaneTexture()
 
     this.renderer.setRenderTarget(null)
   }

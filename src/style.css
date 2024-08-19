@@ -123,6 +123,11 @@ table {
   border-spacing: 0;
 }
 
+#app {
+  height: 500vh;
+  position: relative;
+}
+
 #webgl {
   position: fixed;
   inset: 0;

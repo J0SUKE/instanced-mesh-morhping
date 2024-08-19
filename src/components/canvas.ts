@@ -40,6 +40,10 @@ export default class Canvas {
     this.createCubes()
     this.createGeometryRenderer()
     this.render()
+
+    this.debug.add(this.camera.position, 'x').min(-10).max(15).step(1).name('camera x').step(0.1).listen()
+    this.debug.add(this.camera.position, 'y').min(-10).max(15).step(1).name('camera y').step(0.1).listen()
+    this.debug.add(this.camera.position, 'z').min(-10).max(15).step(1).name('camera z').step(0.1).listen()
   }
 
   createScene() {
@@ -49,8 +53,9 @@ export default class Canvas {
   createCamera() {
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100)
     this.scene.add(this.camera)
-    this.camera.position.z = 5
-    this.camera.position.y = 5
+    this.camera.position.z = 7
+    this.camera.position.y = 7
+    this.camera.position.x = -7
   }
 
   createOrbitControls() {
@@ -139,6 +144,7 @@ export default class Canvas {
       renderer: this.renderer,
       scene: this.scene,
       debug: this.debug,
+      camera: this.camera,
     })
   }
 

@@ -1,39 +1,78 @@
 
-uniform sampler2D uWorldTexture;
+uniform sampler2D uMapTexture;
 uniform sampler2D uDisplacementTexture;
 uniform sampler2D uMaskTexture;
 uniform vec2 uTextureRes;
 varying vec2 vUv;
 
 uniform float uMaskToMapProgress;
+uniform float uTime;
+
+uniform float uStart;
+uniform float uEnd;
+
+
+vec3 drawSmoothstep(vec3 color,float start,float end)
+{
+    vec3 clr = color;
+    
+    float dist = distance(vec2(0.5),vUv);
+    
+    float startPct =  smoothstep( start-0.02, start, dist) -
+          smoothstep( start, start+0.02, dist);
+
+    clr = (1.0-startPct)*clr+startPct*vec3(0.0,0.0,1.0);
+
+    float endPct =  smoothstep( end-0.02, end, dist) -
+          smoothstep( end, end+0.02, dist);
+
+    clr = (1.0-endPct)*clr+endPct*vec3(0.0,0.0,1.0);
+
+    return clr;
+}
 
 
 void main()
 {    
     
-    vec4 mapTexture = texture2D(uWorldTexture,vUv);
+    vec3 color = vec3(0.);
+
+    //morphing    
+    vec4 mapTexture = texture2D(uMapTexture,vUv);
     vec4 maskTexture = texture2D(uMaskTexture,vUv);
-    vec3 color = vec3(1.);    
 
-    vec4 maskToMapTexture = mix(maskTexture,mapTexture,uMaskToMapProgress);
-
-    //gl_FragColor = maskToMapTexture;
-
-    // float maskStart = 0.35;
-    // float maskEnd = 0.45;
-    float maskEnd = 1.-uMaskToMapProgress;
+    float maskEnd = 1.-(uMaskToMapProgress*0.5 + 0.5);
     float maskStart = maskEnd-0.1;    
-
-    //max is maskEnd=0
     
-    float mask = smoothstep(maskStart,maskEnd,vUv.x)
+    float mapMask = smoothstep(maskStart,maskEnd,vUv.x)
                 *(1.-smoothstep(1.-maskEnd,1.-maskStart,vUv.x))
                 *smoothstep(maskStart,maskEnd,vUv.y)
                 *(1.-smoothstep(1.-maskEnd,1.-maskStart,vUv.y));
 
-    vec3 maskedMap = mapTexture.rgb * vec3(mask);
+    vec3 maskedMap = mapTexture.rgb * vec3(mapMask);
 
-    vec3 final = max(maskedMap,maskTexture.rgb);
+    vec3 maskToMapTexture = max(maskedMap,maskTexture.rgb);
+    
+    color.r = maskToMapTexture.r;
 
-    gl_FragColor = vec4(final,1.);
+    //elevation
+    float elevation = 0.;
+    float dist = 1.-distance(vec2(0.5),vUv);
+
+    float ampl = 1.;
+
+    float decayStart = pow(uMaskToMapProgress,2.);
+    float decayEnd = decayStart+0.1;
+
+    elevation = sin(dist*40.+uMaskToMapProgress*15.)*ampl;
+    
+    elevation*=(smoothstep(decayStart,decayEnd,1.-dist))*smoothstep(0.,0.1,uMaskToMapProgress);
+
+    //draw smoothstep limits
+    //color = drawSmoothstep(color,decayStart,decayEnd);
+    
+    color.g = elevation;    
+
+
+    gl_FragColor = vec4(color,1.);
 }

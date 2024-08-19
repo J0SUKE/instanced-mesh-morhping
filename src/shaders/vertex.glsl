@@ -13,24 +13,17 @@ varying float vScale;
 uniform sampler2D uTexture;
 
 void main()
-{                
-        
-    
-    vec3 instancePosition = (instanceMatrix * vec4(position,1.)).xyz;    
+{                            
+    vec4 texel = texture2D(uTexture,aInstanceUV);
 
-    vec4 text = texture2D(uTexture,aInstanceUV);
-    float scale = text.g;
-    //scale*=step(0.5,scale);
 
-    vec3 scaledPosition = scale*position;
-
-    
+    //cube scale
+    float scale = texel.r;
+    vec3 scaledPosition = scale*position;    
     vec4 modelPosition = modelMatrix*instanceMatrix * vec4(scaledPosition, 1.0);
 
-    float elevation =0.;
-
-    
-    
+    //cube elevation
+    float elevation =0.;        
     modelPosition.y+=step(0.,position.y)*elevation;
     
     
@@ -40,7 +33,7 @@ void main()
     gl_Position = projectedPosition;    
 
 
-    //varying
+    //varyings
     vInstancePosition=aInstancePosition;
     vPosition=modelPosition.xyz;
     vElevation=elevation;

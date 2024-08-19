@@ -54,7 +54,11 @@ export default class GeometryRenderer {
             this.material.uniforms.uTextureRes.value = new THREE.Vector2(naturalWidth, naturalHeight)
           })
         ),
-        uMaskTexture: new THREE.Uniform(new THREE.TextureLoader().load('./texture-mask-graph.png')),
+        uMaskTexture: new THREE.Uniform(
+          new THREE.TextureLoader().load('./texture-mask-graph.png', (texture) => {
+            texture.magFilter = THREE.NearestFilter
+          })
+        ),
         uTextureRes: new THREE.Uniform(new THREE.Vector2(1)),
         uMaskToMapProgress: new THREE.Uniform(0),
       },

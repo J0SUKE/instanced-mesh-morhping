@@ -24,7 +24,7 @@ export default class Cubes {
   constructor({ scene, sizes }: Props) {
     this.scene = scene
     this.sizes = sizes
-    this.size = 100
+    this.size = 150
     this.blockSize = 0.25
 
     this.createGeometry()

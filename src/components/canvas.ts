@@ -41,9 +41,9 @@ export default class Canvas {
     this.createGeometryRenderer()
     this.render()
 
-    this.debug.add(this.camera.position, 'x').min(-10).max(15).step(1).name('camera x').step(0.1).listen()
-    this.debug.add(this.camera.position, 'y').min(-10).max(15).step(1).name('camera y').step(0.1).listen()
-    this.debug.add(this.camera.position, 'z').min(-10).max(15).step(1).name('camera z').step(0.1).listen()
+    //this.debug.add(this.camera.position, 'x').min(-10).max(15).step(1).name('camera x').step(0.1).listen()
+    //this.debug.add(this.camera.position, 'y').min(-10).max(15).step(1).name('camera y').step(0.1).listen()
+    //this.debug.add(this.camera.position, 'z').min(-10).max(15).step(1).name('camera z').step(0.1).listen()
   }
 
   createScene() {

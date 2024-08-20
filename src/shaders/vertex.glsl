@@ -1,5 +1,4 @@
 uniform float uTime;
-uniform float uAmplitude;
 
 attribute vec3 aInstancePosition;
 attribute vec2 aInstanceUV;
@@ -16,6 +15,11 @@ void main()
 {                            
     vec4 texel = texture2D(uTexture,aInstanceUV);
 
+    //texel.r contain the scale
+    //texel.g contain the elevation
+    //
+    //texel.a contain the amplitude of the elevation
+
 
     //cube scale
     float scale = texel.r;
@@ -23,8 +27,8 @@ void main()
     vec4 modelPosition = modelMatrix*instanceMatrix * vec4(scaledPosition, 1.0);
 
     //cube elevation
-    float elevation =texel.g*uAmplitude;        
-    //modelPosition.y+=step(0.,position.y)*elevation;
+    float elevation =texel.g*texel.a;
+    //modelPosition.y+=elevation;
     modelPosition.y+=elevation;
     
     

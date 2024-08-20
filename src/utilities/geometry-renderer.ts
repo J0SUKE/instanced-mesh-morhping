@@ -38,7 +38,7 @@ export default class GeometryRenderer {
     this.createMaterial()
     this.createOrthographicCamera()
     this.createPlane()
-    //this.createDebugPlane()
+    this.createDebugPlane()
     this.setupDebug()
     this.scrollProgress()
   }
@@ -56,11 +56,13 @@ export default class GeometryRenderer {
       fragmentShader,
       uniforms: {
         uTime: new THREE.Uniform(0),
+
+        /*
+         *  Textures
+         */
         uMapTexture: new THREE.Uniform(
           new THREE.TextureLoader().load('./usa.png', (texture) => {
-            const { naturalWidth, naturalHeight } = texture.image
             texture.magFilter = THREE.NearestFilter
-            this.material.uniforms.uTextureRes.value = new THREE.Vector2(naturalWidth, naturalHeight)
           })
         ),
         uMaskTexture: new THREE.Uniform(
@@ -68,9 +70,23 @@ export default class GeometryRenderer {
             texture.magFilter = THREE.NearestFilter
           })
         ),
-        uTextureRes: new THREE.Uniform(new THREE.Vector2(1)),
+        uCityTexture: new THREE.Uniform(
+          new THREE.TextureLoader().load('./texture-displacement-street.png', (texture) => {
+            texture.magFilter = THREE.NearestFilter
+          })
+        ),
+
+        /*
+         *  Progress
+         */
         uMaskToMapProgress: new THREE.Uniform(0),
-        uTexture: new THREE.Uniform(new THREE.Vector4()),
+        uMapToCityProgress: new THREE.Uniform(0),
+
+        /*
+         *  Amplitude
+         */
+        uAmplitude: new THREE.Uniform(2),
+        uCityAmplitude: new THREE.Uniform(7),
       },
     })
   }
@@ -138,7 +154,7 @@ export default class GeometryRenderer {
 
     container.style.zIndex = '10'
 
-    const obj = { progress: 0 }
+    const obj = { progress: 0, p2: 0 }
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -148,6 +164,7 @@ export default class GeometryRenderer {
         scrub: true,
         onUpdate: () => {
           this.material.uniforms.uMaskToMapProgress.value = Math.pow(obj.progress, 3)
+          this.material.uniforms.uMapToCityProgress.value = Math.pow(obj.p2, 3)
         },
       },
     })
@@ -174,10 +191,26 @@ export default class GeometryRenderer {
       },
       '<='
     )
+
+    tl.to(obj, {
+      p2: 1,
+    })
   }
 
   setupDebug() {
-    this.debug.add(this.material.uniforms.uMaskToMapProgress, 'value').min(0).max(1).step(0.001).listen()
+    this.debug
+      .add(this.material.uniforms.uMaskToMapProgress, 'value')
+      .min(0)
+      .max(1)
+      .step(0.001)
+      .name('uMaskToMapProgress')
+    this.debug
+      .add(this.material.uniforms.uMapToCityProgress, 'value')
+      .min(0)
+      .max(1)
+      .step(0.001)
+      .listen()
+      .name('uMapToCityProgress')
   }
 
   updateDebugPlaneTexture() {
@@ -202,7 +235,7 @@ export default class GeometryRenderer {
     this.renderer.render(this.plane, this.camera)
 
     //const pixelData = this.readRenderTargetPixels()
-    //this.updateDebugPlaneTexture()
+    this.updateDebugPlaneTexture()
 
     this.renderer.setRenderTarget(null)
   }

@@ -3,6 +3,7 @@ uniform sampler2D uMapTexture;
 uniform sampler2D uDisplacementTexture;
 uniform sampler2D uMaskTexture;
 uniform sampler2D uCityTexture;
+uniform sampler2D uCityShadowsTexture;
 
 uniform vec2 uTextureRes;
 varying vec2 vUv;
@@ -55,11 +56,9 @@ void main()
     //textures
     vec4 mapTexture = texture2D(uMapTexture,vUv);
     vec4 maskTexture = texture2D(uMaskTexture,vUv);
+    vec4 cityShadowsTexture = texture2D(uCityShadowsTexture,vUv);
     vec4 cityTexture = texture2D(uCityTexture,vUv);
-    cityTexture.r = 1.;
-
-
-    //color.a = uAmplitude*pow(1.-distance(vec2(0.5),vUv),2.);    
+    cityTexture.r = 1.;    
     
     float totalProgress = uMaskToMapProgress + uMapToCityProgress;
 
@@ -74,8 +73,9 @@ void main()
     color.r+= cityRed;
 
     //amplitudes
-    color.a += uAmplitude*maskToMap;
-    color.a += uAmplitude*mapToCity*pow(dist,2.);
+    float elevationStrenght = 0.;    
+    elevationStrenght += uAmplitude*maskToMap;
+    elevationStrenght += uAmplitude*mapToCity*pow(dist,2.);
     
     
     //transition elevation
@@ -93,15 +93,18 @@ void main()
 
     elevation*=smoothstep(0.,0.1,normalizedProgress);
     
-    color.g = elevation;    
+    color.g = elevation*elevationStrenght;    
     
     color.b = drawSmoothstep(color.rgb,decayStart,decayEnd).b;
 
 
     //height
-    color.b=cityRed*cityTexture.b*uCityAmplitude*(1.-(smoothstep(0.,pow(uMapToCityProgress,2.),distance(vUv,vec2(0.5)))));
+    float heightProgress = pow(uMapToCityProgress,2.);
+    float cityProgress = smoothstep(heightProgress,heightProgress-0.1,1.-dist);
 
-    //color.b+=(1.-(smoothstep(0.,decayStart,distance(vUv,vec2(0.5)))));    
+    color.b=cityRed*cityTexture.b*uCityAmplitude*cityProgress;
+
+    color.a = cityShadowsTexture.r*cityProgress;    
         
 
     gl_FragColor = color;

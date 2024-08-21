@@ -67,7 +67,7 @@ export default class Cubes {
     const instancePositions = new Float32Array(this.size * this.size * 3)
     const uvPositions = new Float32Array(this.size * this.size * 2)
 
-    const gap = width / 2
+    const gap = width / 4
 
     let count = 0
 

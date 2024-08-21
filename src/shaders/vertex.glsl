@@ -1,6 +1,5 @@
 uniform float uTime;
 
-attribute vec3 aInstancePosition;
 attribute vec2 aInstanceUV;
 
 
@@ -8,8 +7,11 @@ varying vec3 vInstancePosition;
 varying vec3 vPosition;
 varying float vElevation;
 varying float vScale;
+varying float vShadows;
+varying vec3 vPos;
 
 uniform sampler2D uTexture;
+
 
 void main()
 {                            
@@ -17,8 +19,8 @@ void main()
 
     //texel.r contain the scale
     //texel.g contain the elevation
-    //
-    //texel.a contain the amplitude of the elevation
+    //texel.b contain the elevation
+    //texel.a contain the shadows
 
 
     //cube scale
@@ -27,7 +29,7 @@ void main()
     vec4 modelPosition = modelMatrix*instanceMatrix * vec4(scaledPosition, 1.0);
 
     //cube elevation
-    float elevation =texel.g*texel.a;
+    float elevation =texel.g;
     modelPosition.y+=elevation;
 
     //cube height
@@ -44,9 +46,9 @@ void main()
 
 
     //varyings
-    vInstancePosition=aInstancePosition;
     vPosition=modelPosition.xyz;
     vElevation=elevation+height;
-    //vElevation=elevation;
     vScale=scale;
+    vShadows=texel.a;
+    vPos=position;
 }

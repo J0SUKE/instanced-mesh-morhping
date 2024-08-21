@@ -40,7 +40,7 @@ export default class GeometryRenderer {
     this.createPlane()
     this.createDebugPlane()
     this.setupDebug()
-    //this.scrollProgress()
+    this.scrollProgress()
   }
 
   createRenderTarget() {
@@ -72,6 +72,11 @@ export default class GeometryRenderer {
         ),
         uCityTexture: new THREE.Uniform(
           new THREE.TextureLoader().load('./texture-displacement-street.png', (texture) => {
+            texture.magFilter = THREE.LinearFilter
+          })
+        ),
+        uCityShadowsTexture: new THREE.Uniform(
+          new THREE.TextureLoader().load('./texture-shadow-street.png', (texture) => {
             texture.magFilter = THREE.NearestFilter
           })
         ),
@@ -80,13 +85,13 @@ export default class GeometryRenderer {
          *  Progress
          */
         uMaskToMapProgress: new THREE.Uniform(1),
-        uMapToCityProgress: new THREE.Uniform(0),
+        uMapToCityProgress: new THREE.Uniform(1),
 
         /*
          *  Amplitude
          */
-        uAmplitude: new THREE.Uniform(3),
-        uCityAmplitude: new THREE.Uniform(7),
+        uAmplitude: new THREE.Uniform(2),
+        uCityAmplitude: new THREE.Uniform(5),
       },
     })
   }
@@ -152,6 +157,9 @@ export default class GeometryRenderer {
     const container = document.getElementById('app')
     if (!container) return
 
+    this.material.uniforms.uMaskToMapProgress.value = 0
+    this.material.uniforms.uMapToCityProgress.value = 0
+
     container.style.zIndex = '10'
 
     const progress = { p1: 0, p2: 0 }
@@ -169,7 +177,27 @@ export default class GeometryRenderer {
       },
     })
 
-    tl.fromTo(
+    const cameraTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: container,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+      },
+    })
+
+    tl.to(
+      progress,
+      {
+        p1: 1,
+      },
+      '<='
+    )
+    tl.to(progress, {
+      p2: 1,
+    })
+
+    cameraTl.fromTo(
       this.perspcamera.position,
       {
         x: -4.6,
@@ -180,20 +208,12 @@ export default class GeometryRenderer {
         x: -2,
         y: 11,
         z: 8,
-      },
-      '<='
+      }
     )
-
-    tl.to(
-      progress,
-      {
-        p1: 1,
-      },
-      '<='
-    )
-
-    tl.to(progress, {
-      p2: 1,
+    cameraTl.to(this.perspcamera.position, {
+      x: -9.84469251600934,
+      y: 3.837494823136712,
+      z: 10.638407998094726,
     })
   }
 

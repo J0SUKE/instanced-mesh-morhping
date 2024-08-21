@@ -40,7 +40,7 @@ export default class GeometryRenderer {
     this.createPlane()
     this.createDebugPlane()
     this.setupDebug()
-    this.scrollProgress()
+    //this.scrollProgress()
   }
 
   createRenderTarget() {
@@ -79,13 +79,13 @@ export default class GeometryRenderer {
         /*
          *  Progress
          */
-        uMaskToMapProgress: new THREE.Uniform(0),
+        uMaskToMapProgress: new THREE.Uniform(1),
         uMapToCityProgress: new THREE.Uniform(0),
 
         /*
          *  Amplitude
          */
-        uAmplitude: new THREE.Uniform(2),
+        uAmplitude: new THREE.Uniform(3),
         uCityAmplitude: new THREE.Uniform(7),
       },
     })
@@ -154,7 +154,7 @@ export default class GeometryRenderer {
 
     container.style.zIndex = '10'
 
-    const obj = { progress: 0, p2: 0 }
+    const progress = { p1: 0, p2: 0 }
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -163,8 +163,8 @@ export default class GeometryRenderer {
         end: 'bottom bottom',
         scrub: true,
         onUpdate: () => {
-          this.material.uniforms.uMaskToMapProgress.value = Math.pow(obj.progress, 3)
-          this.material.uniforms.uMapToCityProgress.value = Math.pow(obj.p2, 3)
+          this.material.uniforms.uMaskToMapProgress.value = progress.p1
+          this.material.uniforms.uMapToCityProgress.value = progress.p2
         },
       },
     })
@@ -185,14 +185,14 @@ export default class GeometryRenderer {
     )
 
     tl.to(
-      obj,
+      progress,
       {
-        progress: 1,
+        p1: 1,
       },
       '<='
     )
 
-    tl.to(obj, {
+    tl.to(progress, {
       p2: 1,
     })
   }
@@ -204,6 +204,7 @@ export default class GeometryRenderer {
       .max(1)
       .step(0.001)
       .name('uMaskToMapProgress')
+
     this.debug
       .add(this.material.uniforms.uMapToCityProgress, 'value')
       .min(0)

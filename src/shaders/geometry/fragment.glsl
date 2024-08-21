@@ -20,15 +20,24 @@ uniform float uCityAmplitude;
 
 float mixTexturesRed(float a,float b,float progress)
 {
-    float maskEnd = 1.-(progress*0.5 + 0.5);
-    float maskStart = maskEnd-0.1;    
+    float dist = distance(vec2(0.5),vUv);
+        
+    float maskStart = progress;
+    float maskEnd = maskStart+0.3;
     
-    float mask = smoothstep(maskStart,maskEnd,vUv.x)
-                *(1.-smoothstep(1.-maskEnd,1.-maskStart,vUv.x))
-                *smoothstep(maskStart,maskEnd,vUv.y)
-                *(1.-smoothstep(1.-maskEnd,1.-maskStart,vUv.y));
 
-    float maskedTexture = b * mask;
+    //square mask
+    
+    // float mask = smoothstep(maskStart,maskEnd,dist)
+    //             *(1.-smoothstep(1.-maskEnd,1.-maskStart,dist))
+    //             *smoothstep(maskStart,maskEnd,dist)
+    //             *(1.-smoothstep(1.-maskEnd,1.-maskStart,dist));
+
+    //circle mask
+    float mask = 1.-smoothstep(progress,progress+0.1,dist);
+
+
+    float maskedTexture = b * (mask);
 
     float maskToMapTexture = max(maskedTexture,a);
     
@@ -40,6 +49,7 @@ void main()
 {    
     
     vec4 color = vec4(0.);
+    float dist = 1.-distance(vec2(0.5),vUv);
 
 
     //textures
@@ -49,17 +59,27 @@ void main()
     cityTexture.r = 1.;
 
 
-    color.a = uAmplitude;
+    //color.a = uAmplitude*pow(1.-distance(vec2(0.5),vUv),2.);    
     
     float totalProgress = uMaskToMapProgress + uMapToCityProgress;
 
-    color.r+= mixTexturesRed(maskTexture.r,mapTexture.r,uMaskToMapProgress)*(1.-step(1.,totalProgress));
-    color.r+= mixTexturesRed(mapTexture.r,cityTexture.r,uMapToCityProgress)*(step(1.,totalProgress));
+    float maskToMap = 1.-step(1.,totalProgress);
+    float mapToCity = step(1.,totalProgress);
 
+
+    //scales
+    color.r+= mixTexturesRed(maskTexture.r,mapTexture.r,(pow(uMaskToMapProgress,2.)))*maskToMap;    
+    
+    float cityRed = mixTexturesRed(mapTexture.r,cityTexture.r,uMapToCityProgress)*mapToCity;
+    color.r+= cityRed;
+
+    //amplitudes
+    color.a += uAmplitude*maskToMap;
+    color.a += uAmplitude*mapToCity*pow(dist,2.);
+    
     
     //transition elevation
-    float elevation = 0.;
-    float dist = 1.-distance(vec2(0.5),vUv);
+    float elevation = 0.;    
 
     float normalizedProgress = mod(totalProgress,1.);
 
@@ -69,10 +89,19 @@ void main()
     elevation = sin(dist*40.+normalizedProgress*15.);
     
     elevation*=(smoothstep(decayStart,decayEnd,1.-dist));
+    elevation*=(1.-smoothstep(decayEnd,decayEnd+0.1,1.-dist));
 
     elevation*=smoothstep(0.,0.1,normalizedProgress);
     
     color.g = elevation;    
+    
+    color.b = drawSmoothstep(color.rgb,decayStart,decayEnd).b;
+
+
+    //height
+    color.b=cityRed*cityTexture.b*uCityAmplitude*(1.-(smoothstep(0.,pow(uMapToCityProgress,2.),distance(vUv,vec2(0.5)))));
+
+    //color.b+=(1.-(smoothstep(0.,decayStart,distance(vUv,vec2(0.5)))));    
         
 
     gl_FragColor = color;

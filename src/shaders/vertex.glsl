@@ -28,8 +28,13 @@ void main()
 
     //cube elevation
     float elevation =texel.g*texel.a;
-    //modelPosition.y+=elevation;
     modelPosition.y+=elevation;
+
+    //cube height
+
+    float height =texel.b;
+    modelPosition.y+=step(0.,position.y)*texel.b;
+
     
     
     
@@ -41,6 +46,7 @@ void main()
     //varyings
     vInstancePosition=aInstancePosition;
     vPosition=modelPosition.xyz;
-    vElevation=elevation;
+    vElevation=elevation+height;
+    //vElevation=elevation;
     vScale=scale;
 }

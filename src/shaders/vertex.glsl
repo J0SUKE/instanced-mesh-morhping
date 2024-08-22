@@ -8,9 +8,11 @@ varying vec3 vPosition;
 varying float vElevation;
 varying float vScale;
 varying float vShadows;
+varying float vHeight;
 varying vec3 vPos;
 
 uniform sampler2D uTexture;
+uniform float uBlockSize;
 
 
 void main()
@@ -20,7 +22,7 @@ void main()
     //texel.r contain the scale
     //texel.g contain the elevation
     //texel.b contain the elevation
-    //texel.a contain the shadows
+    //texel.a contain the lights/shadows
 
 
     //cube scale
@@ -48,6 +50,7 @@ void main()
     //varyings
     vPosition=modelPosition.xyz;
     vElevation=elevation+height;
+    vHeight=height;
     vScale=scale;
     vShadows=texel.a;
     vPos=position;

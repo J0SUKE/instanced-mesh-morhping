@@ -50,8 +50,7 @@ void main()
 {    
     
     vec4 color = vec4(0.);
-    float dist = 1.-distance(vec2(0.5),vUv);
-
+    float dist = 1.-distance(vec2(0.5),vUv);    
 
     //textures
     vec4 mapTexture = texture2D(uMapTexture,vUv);
@@ -65,12 +64,14 @@ void main()
     float maskToMap = 1.-step(1.,totalProgress);
     float mapToCity = step(1.,totalProgress);
 
-
+    //color.a += smoothstep(0.2,0.,1.-dist)*0.6;
     //scales
-    color.r+= mixTexturesRed(maskTexture.r,mapTexture.r,(pow(uMaskToMapProgress,2.)))*maskToMap;    
+    float mapRed = mixTexturesRed(maskTexture.r,mapTexture.r,(pow(uMaskToMapProgress,2.)))*maskToMap;        
+
+    color.r+= mapRed;        
     
     float cityRed = mixTexturesRed(mapTexture.r,cityTexture.r,uMapToCityProgress)*mapToCity;
-    color.r+= cityRed;
+    color.r+= cityRed;    
 
     //amplitudes
     float elevationStrenght = 0.;    
@@ -95,7 +96,12 @@ void main()
     
     color.g = elevation*elevationStrenght;    
     
-    color.b = drawSmoothstep(color.rgb,decayStart,decayEnd).b;
+    float lightStrenght = 0.;
+    lightStrenght+=smoothstep(0.,elevationStrenght,color.g)*0.5;
+    
+    color.a += lightStrenght;
+    
+    //color.b = drawSmoothstep(color.rgb,decayStart,decayEnd).b;
 
 
     //height
@@ -104,8 +110,12 @@ void main()
 
     color.b=cityRed*cityTexture.b*uCityAmplitude*cityProgress;
 
-    color.a = cityShadowsTexture.r*cityProgress;    
+    float lightProgress = clamp(pow(totalProgress,3.),0.,0.9)/3.+0.1;
+
+    color.a += smoothstep(lightProgress,0.,1.-dist)*0.6;
+
+    color.a -= cityShadowsTexture.r*cityProgress*0.5;
         
 
-    gl_FragColor = color;
+    gl_FragColor = color;    
 }

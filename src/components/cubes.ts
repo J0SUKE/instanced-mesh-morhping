@@ -4,6 +4,7 @@ import { Size } from '../types/types'
 import vertexShader from '../shaders/vertex.glsl'
 import fragmentShader from '../shaders/fragment.glsl'
 import GUI from 'lil-gui'
+import { getRgbColor } from '../utilities/get-rgb-color'
 
 interface Props {
   scene: THREE.Scene
@@ -20,6 +21,7 @@ export default class Cubes {
   size: number
   debug: GUI
   blockSize: number
+  colors: Record<string, THREE.Color>
 
   constructor({ scene, sizes, debug }: Props) {
     this.scene = scene
@@ -27,6 +29,12 @@ export default class Cubes {
     this.size = 128
     this.blockSize = 0.25
     this.debug = debug
+
+    this.colors = {
+      uTopColor: getRgbColor(46, 46, 255),
+      uSidesColorBottom: getRgbColor(0, 0, 133),
+      uSidesColorTop: getRgbColor(0, 0, 209),
+    }
 
     this.createGeometry()
     this.createMaterial()
@@ -43,6 +51,23 @@ export default class Cubes {
         uTime: new THREE.Uniform(0),
         uBlockSize: new THREE.Uniform(this.blockSize),
         uTexture: new THREE.Uniform(new THREE.Vector4()),
+        uTopColor: new THREE.Uniform(
+          new THREE.Color().setRGB(this.colors.uTopColor.r, this.colors.uTopColor.g, this.colors.uTopColor.b)
+        ),
+        uSidesColorBottom: new THREE.Uniform(
+          new THREE.Color().setRGB(
+            this.colors.uSidesColorBottom.r,
+            this.colors.uSidesColorBottom.g,
+            this.colors.uSidesColorBottom.b
+          )
+        ),
+        uSidesColorTop: new THREE.Uniform(
+          new THREE.Color().setRGB(
+            this.colors.uSidesColorTop.r,
+            this.colors.uSidesColorTop.g,
+            this.colors.uSidesColorTop.b
+          )
+        ),
       },
     })
   }
@@ -56,7 +81,26 @@ export default class Cubes {
     this.scene.add(this.mesh)
   }
 
-  setupDebug() {}
+  setupDebug() {
+    this.debug
+      .addColor(this.colors, 'uTopColor')
+      .name('uTopColor')
+      .onChange((color: THREE.Color) => {
+        this.material.uniforms.uTopColor.value.setRGB(color.r, color.g, color.b)
+      })
+    this.debug
+      .addColor(this.colors, 'uSidesColorBottom')
+      .name('uSidesColorBottom')
+      .onChange((color: THREE.Color) => {
+        this.material.uniforms.uSidesColorBottom.value.setRGB(color.r, color.g, color.b)
+      })
+    this.debug
+      .addColor(this.colors, 'uSidesColorTop')
+      .name('uSidesColorTop')
+      .onChange((color: THREE.Color) => {
+        this.material.uniforms.uSidesColorTop.value.setRGB(color.r, color.g, color.b)
+      })
+  }
 
   positionMeshes() {
     let dummy = new THREE.Object3D()

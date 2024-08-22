@@ -44,7 +44,7 @@ export default class GeometryRenderer {
   }
 
   createRenderTarget() {
-    this.renderTarget = new THREE.WebGLRenderTarget(this.size, this.size, {
+    this.renderTarget = new THREE.WebGLRenderTarget(1000, 1000, {
       format: THREE.RGBAFormat,
       type: THREE.FloatType,
     })
@@ -72,7 +72,7 @@ export default class GeometryRenderer {
         ),
         uCityTexture: new THREE.Uniform(
           new THREE.TextureLoader().load('./texture-displacement-street.png', (texture) => {
-            texture.magFilter = THREE.LinearFilter
+            texture.magFilter = THREE.NearestFilter
           })
         ),
         uCityShadowsTexture: new THREE.Uniform(
@@ -156,6 +156,8 @@ export default class GeometryRenderer {
   scrollProgress() {
     const container = document.getElementById('app')
     if (!container) return
+
+    document.body.style.overflow = 'auto'
 
     this.material.uniforms.uMaskToMapProgress.value = 0
     this.material.uniforms.uMapToCityProgress.value = 0
@@ -246,7 +248,10 @@ export default class GeometryRenderer {
   }
 
   getTexture() {
-    return this.renderTarget.texture
+    const texture = this.renderTarget.texture
+    texture.magFilter = THREE.NearestFilter
+
+    return texture
   }
 
   render(time: number) {

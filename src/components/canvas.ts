@@ -2,9 +2,6 @@ import * as THREE from 'three'
 import { Dimensions, Size } from '../types/types'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-
-import vertexShader from '../shaders/vertex.glsl'
-import fragmentShader from '../shaders/fragment.glsl'
 import Cubes from './cubes'
 import GeometryRenderer from '../utilities/geometry-renderer'
 
@@ -53,6 +50,7 @@ export default class Canvas {
   createCamera() {
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100)
     this.scene.add(this.camera)
+
     this.camera.position.z = 7
     this.camera.position.y = 7
     this.camera.position.x = -7

@@ -133,5 +133,9 @@ table {
   inset: 0;
   top: 0;
   left: 0;
-  background: rgb(24, 24, 24);
+  background: rgb(0, 4, 49);
+}
+
+body {
+  overflow: hidden;
 }

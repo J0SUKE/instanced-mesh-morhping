@@ -33,14 +33,14 @@ export default class Canvas {
     this.createOrbitControls()
     this.addEventListeners()
     this.createDebug()
-    this.createHelpers()
+    //this.createHelpers()
     this.createCubes()
     this.createGeometryRenderer()
     this.render()
 
-    this.debug.add(this.camera.position, 'x').min(-10).max(15).step(1).name('camera x').step(0.1).listen()
-    this.debug.add(this.camera.position, 'y').min(-10).max(15).step(1).name('camera y').step(0.1).listen()
-    this.debug.add(this.camera.position, 'z').min(-10).max(15).step(1).name('camera z').step(0.1).listen()
+    //this.debug.add(this.camera.position, 'x').min(-10).max(15).step(1).name('camera x').step(0.1).listen()
+    //this.debug.add(this.camera.position, 'y').min(-10).max(15).step(1).name('camera y').step(0.1).listen()
+    //this.debug.add(this.camera.position, 'z').min(-10).max(15).step(1).name('camera z').step(0.1).listen()
   }
 
   createScene() {
@@ -70,7 +70,7 @@ export default class Canvas {
     this.renderer = new THREE.WebGLRenderer({ canvas: this.element, alpha: true })
     this.renderer.setSize(this.dimensions.width, this.dimensions.height)
     this.renderer.render(this.scene, this.camera)
-
+    //this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     this.renderer.setPixelRatio(this.dimensions.pixelRatio)
   }
 

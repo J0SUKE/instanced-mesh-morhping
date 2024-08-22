@@ -40,7 +40,7 @@ export default class Cubes {
     this.createMaterial()
     this.createInstancedMesh()
     this.positionMeshes()
-    this.setupDebug()
+    //this.setupDebug()
   }
 
   createMaterial() {

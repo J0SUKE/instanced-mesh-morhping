@@ -38,9 +38,9 @@ export default class GeometryRenderer {
     this.createMaterial()
     this.createOrthographicCamera()
     this.createPlane()
-    this.createDebugPlane()
+    //this.createDebugPlane()
     this.setupDebug()
-    this.scrollProgress()
+    //this.scrollProgress()
   }
 
   createRenderTarget() {
@@ -227,13 +227,13 @@ export default class GeometryRenderer {
       .step(0.001)
       .name('uMaskToMapProgress')
 
-    this.debug
-      .add(this.material.uniforms.uMapToCityProgress, 'value')
-      .min(0)
-      .max(1)
-      .step(0.001)
-      .listen()
-      .name('uMapToCityProgress')
+    // this.debug
+    //   .add(this.material.uniforms.uMapToCityProgress, 'value')
+    //   .min(0)
+    //   .max(1)
+    //   .step(0.001)
+    //   .listen()
+    //   .name('uMapToCityProgress')
   }
 
   updateDebugPlaneTexture() {
@@ -261,7 +261,7 @@ export default class GeometryRenderer {
     this.renderer.render(this.plane, this.camera)
 
     //const pixelData = this.readRenderTargetPixels()
-    this.updateDebugPlaneTexture()
+    //this.updateDebugPlaneTexture()
 
     this.renderer.setRenderTarget(null)
   }

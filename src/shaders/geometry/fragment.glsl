@@ -97,7 +97,7 @@ void main()
     color.g = elevation*elevationStrenght;    
     
     float lightStrenght = 0.;
-    lightStrenght+=smoothstep(0.,elevationStrenght,color.g)*0.5;
+    lightStrenght+=smoothstep(0.5,elevationStrenght,color.g)*0.2;
     
     color.a += lightStrenght;
     
@@ -110,12 +110,14 @@ void main()
 
     color.b=cityRed*cityTexture.b*uCityAmplitude*cityProgress;
 
-    float lightProgress = clamp(pow(totalProgress,3.),0.,0.9)/3.+0.1;
-
-    color.a += smoothstep(lightProgress,0.,1.-dist)*0.6;
+    float a1 = smoothstep(0.2,0.,1.-dist)*(uMaskToMapProgress*0.5+0.5)*0.5;
+    float a2 = smoothstep(0.5,0.,1.-dist)*(uMapToCityProgress)*0.7;
+    
+    color.a += max(a1,a2);
 
     color.a -= cityShadowsTexture.r*cityProgress*0.5;
         
 
-    gl_FragColor = color;    
+    gl_FragColor = color;
+    
 }

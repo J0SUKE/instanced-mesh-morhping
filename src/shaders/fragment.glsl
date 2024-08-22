@@ -43,4 +43,7 @@ void main()
 
     //gl_FragColor = vec4(vec3(0.,0.,step(uBlockSize/2.,vPos.y)),1.);
     gl_FragColor = vec4(color,1.);
+
+    #include <tonemapping_fragment>
+    //#include <colorspace_fragment>
 }
